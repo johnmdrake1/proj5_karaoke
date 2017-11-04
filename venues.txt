@@ -1,1 +1,8 @@
-Description: Mcdonald Theatre, Latitude: 44.048599, Longitude: -123.093078
+#
+Mcdonald Theatre<br /><br />1010 Willamette St<br />Eugene OR 97401,44.048599,-123.093078
+
+#
+HiFi Music Hall<br /><br />44 E 7th Ave<br />Eugene OR 97401,44.051785,-123.092319
+
+#
+WOW Hall<br /><br />291 W 8th Ave<br />Eugene OR 97401,44.051152,-123.097092

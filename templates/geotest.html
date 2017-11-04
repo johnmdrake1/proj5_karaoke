@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Geolocation</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    
+    <script>
+      // Note: This example requires that you consent to location sharing when
+      // prompted by your browser. If you see the error "The Geolocation service
+      // failed.", it means you probably did not give permission for the browser to
+      // locate you.
+      //Much of this if from the google maps javascript api geolocation example, modified to do everything else I need along with geolocation
+      var map, infoWindow;
+      
+      //initializes map
+      function initMap() {
+        //generic eugene coordinates, this will be replaced and the map will be recentered if geolocation is supported(see below)
+        var eug = {lat: 44.0520691, lng: -123.0867536};
+        //map is created
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: eug,
+          zoom: 15
+
+        });
+        //list of dicts with locations and names
+        var datadict = {{g.datadict|tojson}};
+        //info window for each marker is initialized
+        var infowindow = new google.maps.InfoWindow;
+        
+
+        //loop that adds markers and info windows that appear upon click for each
+        for (var i in datadict){
+          //datadict is a list of dicts, currentdict represents the current dict in the list so a marker can be set
+          var currentdict = datadict[i];
+          //get relevant values for the marker
+          var desc = currentdict["description"];
+          var latt = currentdict["latitude"];
+          var longg = currentdict["longitude"];
+          var poss = {lat: latt, lng: longg};
+          
+          
+          console.log(latt, longg);
+          //creates new marker
+          var marker = new google.maps.Marker({
+            position: poss,
+            map: map,
+            info: desc
+            
+          });
+          //makes infowindow appear upon click for any marker
+          marker.addListener('click', function() {
+            infowindow.setContent(this.info);
+            infowindow.open(map, this);
+            
+          });
+        }
+
+        
+        
+
+
+        //infoWindow with current address using geolocation and reverse geolocation
+        infoWindow = new google.maps.InfoWindow;
+
+        //geocoder initialization
+        var geocoder = new google.maps.Geocoder;
+        
+    
+      
+        //The following block of code was originally the google geolocation example at https://developers.google.com/maps/documentation/javascript/geolocation. I had modified that code to add a marker at the location of the popup. The project requirements call for reverse geolocation, however, to not only center the map at the current location(which this code did before) but also show the current address through reverse geolocation. I took the function geocodeLatLng(geocoder, map, infoWindow) at https://developers.google.com/maps/documentation/javascript/examples/geocoding-reverse and combined it with the code block that was originally here. Essentially, I took pieces of the reverse geolocation example and modified them to make them work with the geolocation example to make one chunk of code that does both. Things that were not relevant included the function definition itself(the reverse geolocation example was a function geocodeLatLng which was called with the value entered in a text box on the page), and certain variables which served to parse strings. The two examples were not extremely different, so I was able to figure out which parts were already covered, which needed to be removed, and which needed to be added. The resulting code below seems to accomplish geolocation and reverse geolocation! I was not expecting it to work, and even though it does I am nervous because what I had before was a fully completed project(with the exception of displaying the current address) and I moved a lot of stuff around to do this. I will include in my repo a file orig.html which will show what I had before JUST IN CASE this does not end up working on the grader's computer. Orig.html's only functional difference is that it does not display the current user address.
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+
+            var latlng = pos;
+            geocoder.geocode({'location': latlng}, function(results, status) {
+              if (status === 'OK') {
+                if (results[0]) {
+                  
+                  var marker = new google.maps.Marker({
+                    position: latlng,
+                    map: map
+                  });
+                  infoWindow.setContent(results[0].formatted_address);
+                  infoWindow.open(map, marker);
+                  map.setCenter(pos);
+                } else {
+                  window.alert('No results found');
+                }
+              } else {
+                window.alert('Geocoder failed due to: ' + status);
+              }
+            });
+
+            
+          }, function() {
+            handleLocationError(true, infoWindow, map.getCenter());
+          });
+        } else {
+          // Browser doesn't support Geolocation
+          handleLocationError(false, infoWindow, map.getCenter());
+        }
+      }
+
+      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(browserHasGeolocation ?
+                              'Error: The Geolocation service failed.' :
+                              'Error: Your browser doesn\'t support geolocation.');
+        infoWindow.open(map);
+      }
+      
+    </script>
+    
+    <script async defer
+    src="{{g.api_key}}">
+    //this is where the api key gets passed.
+    </script>
+  </body>
+</html>

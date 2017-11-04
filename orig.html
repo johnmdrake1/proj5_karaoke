@@ -20,20 +20,66 @@
   </head>
   <body>
     <div id="map"></div>
+    
     <script>
       // Note: This example requires that you consent to location sharing when
       // prompted by your browser. If you see the error "The Geolocation service
       // failed.", it means you probably did not give permission for the browser to
       // locate you.
+      //Much of this if from the google maps javascript api geolocation example, modified to do everything else I need along with geolocation
       var map, infoWindow;
+      
+      //initializes map
       function initMap() {
+        //generic eugene coordinates, this will be replaced and the map will be recentered if geolocation is supported(see below)
         var eug = {lat: 44.0520691, lng: -123.0867536};
+        //map is created
         map = new google.maps.Map(document.getElementById('map'), {
           center: eug,
           zoom: 15
+
         });
+        //list of dicts with locations and names
+        var datadict = {{g.datadict|tojson}};
+        //info window for each marker is initialized
+        var infowindow = new google.maps.InfoWindow;
         
+
+        //loop that adds markers and info windows that appear upon click for each
+        for (var i in datadict){
+          //datadict is a list of dicts, currentdict represents the current dict in the list so a marker can be set
+          var currentdict = datadict[i];
+          //get relevant values for the marker
+          var desc = currentdict["description"];
+          var latt = currentdict["latitude"];
+          var longg = currentdict["longitude"];
+          var poss = {lat: latt, lng: longg};
+          
+          
+          console.log(latt, longg);
+          //creates new marker
+          var marker = new google.maps.Marker({
+            position: poss,
+            map: map,
+            info: desc
+            
+          });
+          //makes infowindow appear upon click for any marker
+          marker.addListener('click', function() {
+            infowindow.setContent(this.info);
+            infowindow.open(map, this);
+            
+          });
+        }
+
+        
+        
+
+
+        //following code taken from google maps javascript API tutorials, puts infowindow at current location based on geolocation if available
         infoWindow = new google.maps.InfoWindow;
+        
+
 
         // Try HTML5 geolocation.
         if (navigator.geolocation) {
@@ -47,6 +93,7 @@
             infoWindow.setContent('Location found.');
             infoWindow.open(map);
             map.setCenter(pos);
+            //I added a marker at the current location(before it was just an infowindow there)
             var marker = new google.maps.Marker({
               position: pos,
               map: map
