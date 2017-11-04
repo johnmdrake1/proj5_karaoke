@@ -45,6 +45,8 @@ for each music venue that has a marker.
 
 Other files include a makefile, credentials.ini(not in repo) with the api key and other details, accompanied by config.py.
 
+NOTE: orig.html should not be relevant, see geotest.html comments for details.
+
 Instructions:
 
 For user:
